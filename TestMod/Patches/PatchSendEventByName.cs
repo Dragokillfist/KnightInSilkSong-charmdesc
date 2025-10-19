@@ -5,7 +5,7 @@ using KIS;
 using KIS.Utils;
 
 [HarmonyPatch(typeof(SendEventByName), "OnEnter", MethodType.Normal)]
-public class Patch_SendEventByName_OnEnter : GeneralPatch
+public class Patch_SendEventByName_OnEnter //: GeneralPatch
 {
     public static bool Prefix(SendEventByName __instance)
     {
