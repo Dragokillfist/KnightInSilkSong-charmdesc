@@ -2797,7 +2797,7 @@ public class HeroController : MonoBehaviour
 			{
 				yield return new WaitForSeconds(enterGate.entryDelay);
 			}
-			yield return new WaitForSeconds(0.4f);
+			// yield return new WaitForSeconds(0.4f);
 			renderer.enabled = true;
 			if (exitedQuake)
 			{
@@ -2851,7 +2851,7 @@ public class HeroController : MonoBehaviour
 			{
 				yield return new WaitForSeconds(enterGate.entryDelay);
 			}
-			yield return new WaitForSeconds(0.4f);
+			// yield return new WaitForSeconds(0.4f);
 			if (!enterGate.customFade)
 			{
 				gm.FadeSceneIn();
@@ -2897,7 +2897,7 @@ public class HeroController : MonoBehaviour
 			{
 				yield return new WaitForSeconds(enterGate.entryDelay);
 			}
-			yield return new WaitForSeconds(0.4f);
+			// yield return new WaitForSeconds(0.4f);
 			if (exitedSuperDashing)
 			{
 				IgnoreInput();
@@ -2939,7 +2939,7 @@ public class HeroController : MonoBehaviour
 			{
 				yield return new WaitForSeconds(enterGate.entryDelay);
 			}
-			yield return new WaitForSeconds(0.4f);
+			// yield return new WaitForSeconds(0.4f);
 			if (exitedSuperDashing)
 			{
 				IgnoreInput();
@@ -2989,7 +2989,7 @@ public class HeroController : MonoBehaviour
 			{
 				yield return new WaitForSeconds(enterGate.entryDelay);
 			}
-			yield return new WaitForSeconds(0.4f);
+			// yield return new WaitForSeconds(0.4f);
 			if (!enterGate.customFade)
 			{
 				gm.FadeSceneIn();
