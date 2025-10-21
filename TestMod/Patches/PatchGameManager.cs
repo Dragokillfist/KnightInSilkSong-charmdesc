@@ -31,3 +31,20 @@ public class Patch_GameManager_SetIsInventoryOpen : GeneralPatch
         }
     }
 }
+[HarmonyPatch(typeof(GameManager), "ReturnToMainMenu", MethodType.Normal)]
+public class Patch_GameManager_ReturnToMainMenu : GeneralPatch
+{
+    public static bool Prefix(GameManager __instance)
+    {
+        if (KnightInSilksong.IsKnight)
+        {
+            KnightInSilksong.Instance.ToggleKnight();
+            KnightInSilksong.return_to_main_menu = true;
+            "return to Main Menu".LogInfo();
+        }
+        return true;
+    }
+    public static void Postfix(GameManager __instance)
+    {
+    }
+}

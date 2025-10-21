@@ -1,5 +1,6 @@
 using Knight;
 using KIS;
+using GlobalEnums;
 [HarmonyPatch(typeof(Knight.HeroController), "LocateSpawnPoint", MethodType.Normal)]
 public class Patch_HeroController_LocateSpawnPoint : GeneralPatch
 {
@@ -31,5 +32,34 @@ public class Patch_HeroController_CharmUpdate : GeneralPatch
             PlayMakerFSM.BroadcastEvent("CHARM INDICATOR CHECK");
             EventRegister.SendEvent("UPDATE BLUE HEALTH");
         }
+    }
+}
+[HarmonyPatch(typeof(Knight.HeroController), "Attack", MethodType.Normal)]
+public class Patch_HeroController_Attack : GeneralPatch
+{
+    public static bool Prefix(Knight.HeroController __instance, AttackDirection attackDir)
+    {
+        if (KnightInSilksong.IsKnight)
+        {
+            HeroController.instance.IncrementAttackCounter();
+        }
+        return true;
+    }
+    public static void Postfix(Knight.HeroController __instance, AttackDirection attackDir)
+    {
+    }
+}
+
+[HarmonyPatch(typeof(Knight.HeroController), "FinishedEnteringScene", MethodType.Normal)]
+public class Patch_Knight_HeroController_FinishedEnteringScene : GeneralPatch
+{
+    public static bool Prefix()
+    {
+        return true;
+    }
+    public static void Postfix()
+    {
+        "Knight FinishedEnteringScene Patch".LogInfo();
+        Time.time.LogInfo();
     }
 }

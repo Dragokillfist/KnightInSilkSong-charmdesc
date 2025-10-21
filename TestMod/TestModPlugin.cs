@@ -17,6 +17,7 @@ public partial class KnightInSilksong : BaseUnityPlugin
     public GameObject bundle = null;
     internal static KnightInSilksong Instance = null;
     internal static ManualLogSource logger = null;
+    internal static bool return_to_main_menu = false;
     public AssetBundle hk = null;
     public AssetBundle mat = null;
     public GameObject knight = null;
@@ -70,8 +71,12 @@ public partial class KnightInSilksong : BaseUnityPlugin
 
 
     }
-    private void ToggleKnight()
+    internal void ToggleKnight()
     {
+        if (!GameManager.instance.IsGameplayScene())
+        {
+            return;
+        }
         bool laststate = iskight;
         iskight = !iskight;
         if (laststate)
@@ -102,50 +107,77 @@ public partial class KnightInSilksong : BaseUnityPlugin
             HudCanvas.instance.gameObject.SetActive(false);
             if (KnightController == null)
             {
-                knight.GetComponent<Knight.HeroController>().hardLandingEffectPrefab = HeroController.instance.hardLandingEffectPrefab;
-                knight.GetComponent<Knight.HeroController>().softLandingEffectPrefab = HeroController.instance.softLandingEffectPrefab;
-                GameObject.Instantiate(knight);
-                KnightController.gameObject.FindGameObjectInChildren("Attacks").Find("Slash").LocateMyFSM("damages_enemy").InsertCustomAction("Send Event", () => { "Send Event".LogInfo(); }, 0);
-                KnightController.gameObject.FindGameObjectInChildren("Charm Effects").LocateMyFSM("Fury").AddCustomAction("Get Ref", (fsm) =>
-                {
-                    fsm.GetVariable<FsmGameObject>("Fury Vignette").Value = fury_effect_instance;
-                });
 
-
-                hud_instance = GameObject.Instantiate(hud_canvas);
-                hud_instance.transform.SetParent(HudCanvas.instance.gameObject.transform.parent, true);
-                GameCameras.instance.soulOrbFSM = hud_instance.FindGameObjectInChildren("Soul Orb").LocateMyFSM("Soul Orb Control");
-                GameCameras.instance.soulVesselFSM = hud_instance.FindGameObjectInChildren("Soul Orb").FindGameObjectInChildren("Vessels").LocateMyFSM("Update Vessels");
-                GameManager.instance.soulOrb_fsm = GameCameras.instance.soulOrbFSM;
-                GameManager.instance.soulVessel_fsm = GameCameras.instance.soulVesselFSM;
-
-                charm_instance = GameObject.Instantiate(charm);
-                charm_instance.transform.SetParent(HudCanvas.instance.transform.parent.parent.parent.Find("Inventory").Find("Tools"), false);
-                charm_instance.transform.position = new Vector3(-4.05f, 7.55f, 2.3f);
-
+                InstKnight();
                 fury_effect_instance = GameObject.Instantiate(fury_effect);
                 DontDestroyOnLoad(fury_effect_instance);
-
-
-
             }
             else
             {
                 KnightController.gameObject.SetActive(true);
+                if (return_to_main_menu)
+                {
+                    Traverse.Create(KnightController).Method("SetupGameRefs").GetValue();
+                    "Try SetupGameRefs".LogInfo();
+                    return_to_main_menu = false;
+                }
+            }
+            if (hud_instance == null)
+            {
+                InstHud(charm_instance == null);
+            }
+            else
+            {
                 hud_instance.SetActive(true);
             }
         }
         OnToggleKnight?.Invoke(iskight);
 
+
+        void InstHud(bool with_charm = true)
+        {
+            hud_instance = GameObject.Instantiate(hud_canvas);
+            hud_instance.transform.SetParent(HudCanvas.instance.gameObject.transform.parent, true);
+            GameCameras.instance.soulOrbFSM = hud_instance.FindGameObjectInChildren("Soul Orb").LocateMyFSM("Soul Orb Control");
+            GameCameras.instance.soulVesselFSM = hud_instance.FindGameObjectInChildren("Soul Orb").FindGameObjectInChildren("Vessels").LocateMyFSM("Update Vessels");
+            GameManager.instance.soulOrb_fsm = GameCameras.instance.soulOrbFSM;
+            GameManager.instance.soulVessel_fsm = GameCameras.instance.soulVesselFSM;
+            if (with_charm) InstCharm();
+
+        }
+        void InstCharm()
+        {
+            charm_instance = GameObject.Instantiate(charm);
+            charm_instance.transform.SetParent(HudCanvas.instance.transform.parent.parent.parent.Find("Inventory").Find("Tools"), false);
+            charm_instance.transform.position = new Vector3(-4.05f, 7.55f, 2.3f);
+        }
+
     }
 
-
+    internal void InstKnight()
+    {
+        knight.GetComponent<Knight.HeroController>().hardLandingEffectPrefab = HeroController.instance.hardLandingEffectPrefab;
+        knight.GetComponent<Knight.HeroController>().softLandingEffectPrefab = HeroController.instance.softLandingEffectPrefab;
+        GameObject.Instantiate(knight);
+        KnightController.gameObject.FindGameObjectInChildren("Attacks").Find("Slash").LocateMyFSM("damages_enemy").InsertCustomAction("Send Event", () => { "Send Event".LogInfo(); }, 0);
+        KnightController.gameObject.FindGameObjectInChildren("Charm Effects").LocateMyFSM("Fury").AddCustomAction("Get Ref", (fsm) =>
+        {
+            fsm.GetVariable<FsmGameObject>("Fury Vignette").Value = fury_effect_instance;
+        });
+        KnightController.gameObject.Find("Vignette").SetActive(false);
+        KnightController.gameObject.Find("white_light_donut").SetActive(false);
+        KnightController.gameObject.Find("Attacks").Find("Sharp Shadow").tag = "Sharp Shadow";
+    }
     private void Update()
     {
 
         if (Input.GetKeyDown(KeyCode.F5))
         {
             ToggleKnight();
+        }
+        if (Input.GetKeyDown(KeyCode.F6))
+        {
+
         }
     }
 
